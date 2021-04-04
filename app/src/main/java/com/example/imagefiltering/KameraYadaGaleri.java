@@ -1,48 +1,18 @@
 package com.example.imagefiltering;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.Activity;
-import android.content.ActivityNotFoundException;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.widget.RelativeLayout;
 
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 //package com.exclusive.original.whatsapp_photo_picker;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 import com.camerakit.CameraKitView;
 //import com.exclusive.original.imagefiltering.Adapters.HomeAdapter;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class KameraYadaGaleri extends AppCompatActivity {
     CameraKitView cameraKitView;
@@ -55,7 +25,7 @@ public class KameraYadaGaleri extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_kamera_yada_galeri);
         btnCapture= findViewById(R.id.peekRecyclerView);
-        cameraKitView = findViewById(R.id.camera);
+        //cameraKitView = findViewById(R.id.cameraView);
         btnKamera = findViewById(R.id.btnKamera);
 
         btnKamera.setOnClickListener(new View.OnClickListener() {

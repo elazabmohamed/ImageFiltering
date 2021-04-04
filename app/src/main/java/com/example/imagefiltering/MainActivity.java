@@ -3,8 +3,10 @@ package com.example.imagefiltering;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
+import android.Manifest;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,9 +27,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
-    Button btnKayitOl;
-    Button btnGiris;
-    Button btnDevam;
+    Button btnKayitOl, btnGiris;
     FloatingActionButton btnGaleri, btnCamera;
     User defaultNafiz = new User();
     UserDB db=new UserDB();
@@ -49,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
         btnGiris = findViewById(R.id.btnGiris);
         btnCamera = findViewById(R.id.btnCamera);
         btnGaleri = findViewById(R.id.btnGaleri);
-
         btnKayitOl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -63,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
                 //Intent intent = new Intent(MainActivity.this,KameraYadaGaleri.class);
                 //startActivity(intent);
                 //pickImage();
+
                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 try {
                     createImageFile();
@@ -77,6 +77,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+
         btnGaleri.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -87,9 +89,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-
     }
+
 
     private  void pickImage(){
 
