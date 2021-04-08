@@ -6,104 +6,58 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <LinearLayout
-        android:id="@+id/linearLayout2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:orientation="vertical"
+    <ImageView
+        android:alpha="0.7"
+        android:id="@+id/imageGaleri"
+        android:layout_width="224dp"
+        android:layout_height="260dp"
+        android:layout_marginTop="124dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.157">
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout3"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/ic_baseline_add_circle_outline_24" />
 
-        <EditText
-            android:id="@+id/etKullaniciAdi"
+    <LinearLayout
+        android:id="@+id/linearLayout3"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:gravity="right"
+        android:orientation="horizontal">
+
+        <Button
+            android:alpha="0.7"
+            android:id="@+id/btnGirisYap"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="64dp"
-            android:ems="10"
-            android:hint="Kullanıcı Adı"
-            android:inputType="textPersonName" />
+            android:layout_height="match_parent"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="0"
+            android:text="Giriş Yap" />
 
-        <EditText
-            android:id="@+id/etSifre"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:ems="10"
-            android:hint="Şifre"
-            android:inputType="textPassword" />
-
-        <TextView
-            android:id="@+id/tvMessage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="invisible" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/btnKayit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:layout_marginLeft="5dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginRight="5dp"
-                android:text="Kayıt ol" />
-
-            <Button
-                android:id="@+id/btnGiris"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:layout_marginLeft="5dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginRight="5dp"
-                android:onClick="Login"
-                android:text="Giriş yap" />
-        </LinearLayout>
+        <ImageView
+            android:id="@+id/imageCamera"
+            android:layout_width="56dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="0"
+            app:srcCompat="@android:drawable/ic_menu_camera" />
 
     </LinearLayout>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/btnGaleri"
+    <TextView
+        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:clickable="true"
-        app:backgroundTint="#00FFFFFF"
-        app:fabCustomSize="100dp"
+        android:layout_marginTop="16dp"
+        android:text="Fotoğraf seçmek için işarete basın"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.27"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout2"
-        app:layout_constraintVertical_bias="0.437"
-        app:maxImageSize="100dp"
-        app:srcCompat="@drawable/add" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/btnCamera"
-        android:layout_width="102dp"
-        android:layout_height="98dp"
-        android:layout_marginStart="84dp"
-        android:layout_marginLeft="84dp"
-        android:clickable="true"
-        app:backgroundTint="#00FFFFFF"
-        app:fabCustomSize="100dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/btnGaleri"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout2"
-        app:layout_constraintVertical_bias="0.44"
-        app:maxImageSize="90dp"
-        app:srcCompat="@drawable/photocamera" />
-
+        app:layout_constraintTop_toBottomOf="@+id/imageGaleri"
+        app:layout_constraintVertical_bias="0.145" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

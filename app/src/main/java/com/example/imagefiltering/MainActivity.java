@@ -6,63 +6,64 @@ import androidx.core.content.FileProvider;
 import android.Manifest;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.imagefiltering.model.User;
 import com.example.imagefiltering.model.UserDB;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
-    Button btnKayitOl, btnGiris;
-    FloatingActionButton btnGaleri, btnCamera;
-    User defaultNafiz = new User();
-    UserDB db=new UserDB();
+    Button btnGirisYap;
+    ImageView imageGaleri, imageCamera;
     private static final int IMAGE_PICK_CODE = 1000;
-    static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static int RESULT_LOAD_IMAGE = 1;
+    private static int REQUEST_IMAGE_CAPTURE = 1;
+    ImageView Display;
     String currentPhotoPath;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //      Default User
-        defaultNafiz.setUsername("nafiz");
-        defaultNafiz.setEmail("nafiz@gmail.com");
-        defaultNafiz.setPassword("123");
-        defaultNafiz.setUserID(1);
-        int result = db.AddUser(defaultNafiz);
+        btnGirisYap = findViewById(R.id.btnGirisYap);
+        imageCamera = findViewById(R.id.imageCamera);
+        imageGaleri = findViewById(R.id.imageGaleri);
+        Display = findViewById(R.id.imgViewDisplay);
 
-        btnKayitOl=findViewById(R.id.btnKayit);
-        btnGiris = findViewById(R.id.btnGiris);
-        btnCamera = findViewById(R.id.btnCamera);
-        btnGaleri = findViewById(R.id.btnGaleri);
-        btnKayitOl.setOnClickListener(new View.OnClickListener() {
+        btnGirisYap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, KayitOlActivity.class);
+                Intent intent= new Intent(MainActivity.this, GirisYapActivity.class);
                 startActivity(intent);
             }
         });
-        btnCamera.setOnClickListener(new View.OnClickListener() {
+
+        imageCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Intent intent = new Intent(MainActivity.this,KameraYadaGaleri.class);
-                //startActivity(intent);
-                //pickImage();
-
                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 try {
                     createImageFile();
@@ -79,18 +80,60 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        btnGaleri.setOnClickListener(new View.OnClickListener() {
+        imageGaleri.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Intent intent = new Intent(MainActivity.this,KameraYadaGaleri.class);
-                //startActivity(intent);
-                pickImage();
-
+                //pickImage();
+                getImageFromAlbum();
             }
         });
-
     }
 
+
+    private void getImageFromAlbum(){
+        try{
+            Intent i = new Intent(Intent.ACTION_PICK,
+                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            startActivityForResult(i, RESULT_LOAD_IMAGE);
+        }catch(Exception exp){
+            Log.i("Error",exp.toString());
+        }
+    }
+
+
+    @Override
+    protected void onActivityResult(int reqCode, int resultCode, Intent data) {
+        super.onActivityResult(reqCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            try {
+                final Uri imageUri = data.getData();
+                final InputStream imageStream = getContentResolver().openInputStream(imageUri);
+                final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                Intent intent= new Intent(MainActivity.this, KameraYadaGaleri.class);
+                intent.putExtra("imageUri", imageUri);
+                startActivity(intent);
+
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                Toast.makeText(MainActivity.this, "Something went wrong", Toast.LENGTH_LONG).show();
+            }
+
+        }else {
+            Toast.makeText(MainActivity.this, "You haven't picked Image",Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public static String encodeToBase64(Bitmap image) {
+        Bitmap immage = image;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        immage.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        byte[] b = baos.toByteArray();
+        String imageEncoded = Base64.encodeToString(b, Base64.DEFAULT);
+
+        Log.d("Image Log:", imageEncoded);
+        return imageEncoded;
+    }
 
     private  void pickImage(){
 
@@ -152,47 +195,4 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-
-    public void Login(View v) {
-        EditText etUserName = (EditText) findViewById(R.id.etKullaniciAdi);
-        EditText etPassword = (EditText) findViewById(R.id.etSifre);
-        TextView tvMessage = (TextView) findViewById(R.id.tvMessage);
-
-        String username = etUserName.getText().toString().trim();
-        String password = etPassword.getText().toString().trim();
-
-        if (username.equals("")) {
-            tvMessage.setText("Enter Your Username");
-            tvMessage.setVisibility(View.VISIBLE);
-            tvMessage.setTextColor(Color.RED);
-            etUserName.requestFocus();
-            return;
-        }
-
-        if (password.equals("")) {
-            tvMessage.setText("Enter Your Password");
-            tvMessage.setVisibility(View.VISIBLE);
-            tvMessage.setTextColor(Color.RED);
-            etPassword.requestFocus();
-            return;
-        }
-
-
-        //database
-//        if(username.equals("admin") && password.equals("12345")){
-        if (UserDB.Login(username, password)) {
-
-//            tvMessage.setText("Welcome to Android..");
-//            tvMessage.setVisibility(View.VISIBLE);
-//            tvMessage.setTextColor(Color.GREEN);
-
-            // Intent homeactivity'ye username verisini text olarak gönderiyoruz
-
-            Intent intent = new Intent(this,KameraYadaGaleri.class);
-            //intent.putExtra("data", username);
-            startActivity(intent);
-
-        }
-    }
 }
