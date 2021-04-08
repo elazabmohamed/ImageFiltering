@@ -40,7 +40,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
-    Button btnGirisYap;
+    public static Button btnGirisYap;
     ImageView imageGaleri, imageCamera;
     private static final int IMAGE_PICK_CODE = 1000;
     private static int RESULT_LOAD_IMAGE = 1;

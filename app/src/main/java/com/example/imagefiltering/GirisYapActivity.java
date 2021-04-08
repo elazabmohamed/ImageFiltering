@@ -32,13 +32,13 @@ public class GirisYapActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_giris_yap);
-
         //      Default User
         defaultNafiz.setUsername("nafiz");
         defaultNafiz.setEmail("nafiz@gmail.com");
         defaultNafiz.setPassword("123");
         defaultNafiz.setUserID(1);
         int result = db.AddUser(defaultNafiz);
+
 
         btnKayitOl=findViewById(R.id.btnKayit);
         btnGiris = findViewById(R.id.btnGiris);
@@ -88,10 +88,14 @@ public class GirisYapActivity extends AppCompatActivity {
 
             // Intent homeactivity'ye username verisini text olarak gönderiyoruz
 
-            Intent intent = new Intent(this,KameraYadaGaleri.class);
-            //intent.putExtra("data", username);
-            startActivity(intent);
+//            Intent intent = new Intent(this,MainActivity.class);
+//            intent.putExtra("data", username);
+//
+//            startActivity(intent);
 
+            //      temporary code
+            MainActivity.btnGirisYap.setVisibility(View.GONE);
+            onBackPressed();
         }
     }
 
