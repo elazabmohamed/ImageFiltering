@@ -1,6 +1,9 @@
 package com.example.imagefiltering;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
 import android.Manifest;
@@ -44,6 +47,11 @@ public class MainActivity extends AppCompatActivity {
     private static int REQUEST_IMAGE_CAPTURE = 1;
     ImageView Display;
     String currentPhotoPath;
+    private static final int MY_CAMERA_REQUEST_CODE = 100;
+
+    private static final int CAMERA_PERMISSION_CODE = 100;
+    private static final int STORAGE_PERMISSION_CODE = 101;
+    private static int temp=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +60,10 @@ public class MainActivity extends AppCompatActivity {
         imageCamera = findViewById(R.id.imageCamera);
         imageGaleri = findViewById(R.id.imageGaleri);
         Display = findViewById(R.id.imgViewDisplay);
+
+        SharedPreferences pref = this.getSharedPreferences("PACKAGE.NAME",MODE_PRIVATE);
+        Boolean firstTime = pref.getBoolean("Camera",true);
+        Boolean firstTime2 = pref.getBoolean("Storage",true);
 
         btnGirisYap.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,10 +76,15 @@ public class MainActivity extends AppCompatActivity {
         imageCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 try {
+                    if(firstTime){
+                        checkPermission(Manifest.permission.CAMERA, CAMERA_PERMISSION_CODE);
+                        pref.edit().putBoolean("Camera",false).apply();
+                    }
+                    temp=1;
+                    //Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     createImageFile();
-                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                    //startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
                     dispatchTakePictureIntent();
                     galleryAddPic();
 
@@ -83,11 +100,77 @@ public class MainActivity extends AppCompatActivity {
         imageGaleri.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(firstTime2){
+                    checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, STORAGE_PERMISSION_CODE);
+                    pref.edit().putBoolean("Storage",false).apply();
+                }
+                temp=2;
                 //pickImage();
                 getImageFromAlbum();
             }
         });
     }
+
+
+
+    public void checkPermission(String permission, int requestCode)
+    {
+        if (ContextCompat.checkSelfPermission(MainActivity.this, permission)
+                == PackageManager.PERMISSION_DENIED) {
+
+            // Requesting the permission
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[] { permission },
+                    requestCode);
+        }
+        else {
+            Toast.makeText(MainActivity.this,
+                    "Permission already granted",
+                    Toast.LENGTH_SHORT)
+                    .show();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,  @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
+        super
+                .onRequestPermissionsResult(requestCode,
+                        permissions,
+                        grantResults);
+
+        if (requestCode == CAMERA_PERMISSION_CODE) {
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(MainActivity.this,
+                        "Camera Permission Granted",
+                        Toast.LENGTH_SHORT)
+                        .show();
+            }
+            else {
+                Toast.makeText(MainActivity.this,
+                        "Camera Permission Denied",
+                        Toast.LENGTH_SHORT)
+                        .show();
+            }
+        }
+        else if (requestCode == STORAGE_PERMISSION_CODE) {
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(MainActivity.this,
+                        "Storage Permission Granted",
+                        Toast.LENGTH_SHORT)
+                        .show();
+            }
+            else {
+                Toast.makeText(MainActivity.this,
+                        "Storage Permission Denied",
+                        Toast.LENGTH_SHORT)
+                        .show();
+            }
+        }
+    }
+
 
 
     private void getImageFromAlbum(){
@@ -104,24 +187,35 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int reqCode, int resultCode, Intent data) {
         super.onActivityResult(reqCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            try {
-                final Uri imageUri = data.getData();
-                final InputStream imageStream = getContentResolver().openInputStream(imageUri);
-                final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-                Intent intent= new Intent(MainActivity.this, KameraYadaGaleri.class);
-                intent.putExtra("imageUri", imageUri);
-                startActivity(intent);
+        if(temp==2){
+            if (resultCode == RESULT_OK) {
+                try {
+                    final Uri imageUri = data.getData();
+                    final InputStream imageStream = getContentResolver().openInputStream(imageUri);
+                    final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                    Intent intent= new Intent(MainActivity.this, KameraYadaGaleri.class);
+                    intent.putExtra("imageUri", imageUri);
+                    startActivity(intent);
 
 
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                Toast.makeText(MainActivity.this, "Something went wrong", Toast.LENGTH_LONG).show();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    Toast.makeText(MainActivity.this, "Something went wrong", Toast.LENGTH_LONG).show();
+                }
+
+            }else {
+                Toast.makeText(MainActivity.this, "You haven't picked Image",Toast.LENGTH_LONG).show();
             }
-
-        }else {
-            Toast.makeText(MainActivity.this, "You haven't picked Image",Toast.LENGTH_LONG).show();
         }
+        else if(temp==1){
+            File f = new File(currentPhotoPath);
+            Uri contentUri = Uri.fromFile(f);
+            Intent intent= new Intent(MainActivity.this, KameraYadaGaleri.class);
+            intent.putExtra("imageUri", contentUri);
+            startActivity(intent);
+
+        }
+
     }
 
     public static String encodeToBase64(Bitmap image) {
