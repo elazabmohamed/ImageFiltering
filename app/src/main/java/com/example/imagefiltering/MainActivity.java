@@ -13,25 +13,16 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.imagefiltering.model.User;
-import com.example.imagefiltering.model.UserDB;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -42,16 +33,12 @@ import java.util.Date;
 public class MainActivity extends AppCompatActivity {
     public static Button btnGirisYap;
     ImageView imageGaleri, imageCamera;
-    private static final int IMAGE_PICK_CODE = 1000;
     private static int RESULT_LOAD_IMAGE = 1;
     private static int REQUEST_IMAGE_CAPTURE = 1;
-    ImageView Display;
     String currentPhotoPath;
-    private static final int MY_CAMERA_REQUEST_CODE = 100;
-
     private static final int CAMERA_PERMISSION_CODE = 100;
     private static final int STORAGE_PERMISSION_CODE = 101;
-    private static int temp=0;
+    private static int onResultTemp =0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,9 +46,8 @@ public class MainActivity extends AppCompatActivity {
         btnGirisYap = findViewById(R.id.btnGirisYap);
         imageCamera = findViewById(R.id.imageCamera);
         imageGaleri = findViewById(R.id.imageGaleri);
-        Display = findViewById(R.id.imgViewDisplay);
 
-        SharedPreferences pref = this.getSharedPreferences("PACKAGE.NAME",MODE_PRIVATE);
+        SharedPreferences pref = this.getSharedPreferences("PACKAGE.NAME", MODE_PRIVATE);
         Boolean firstTime = pref.getBoolean("Camera",true);
         Boolean firstTime2 = pref.getBoolean("Storage",true);
 
@@ -81,20 +67,18 @@ public class MainActivity extends AppCompatActivity {
                         checkPermission(Manifest.permission.CAMERA, CAMERA_PERMISSION_CODE);
                         pref.edit().putBoolean("Camera",false).apply();
                     }
-                    temp=1;
+                    onResultTemp =1;
                     //Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    createImageFile();
+                    //createImageFile();
                     //startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
                     dispatchTakePictureIntent();
                     galleryAddPic();
 
-                } catch (ActivityNotFoundException | IOException e) {
+                } catch (ActivityNotFoundException e) {
                     // display error state to the user
                 }
-
             }
         });
-
 
 
         imageGaleri.setOnClickListener(new View.OnClickListener() {
@@ -104,13 +88,11 @@ public class MainActivity extends AppCompatActivity {
                     checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, STORAGE_PERMISSION_CODE);
                     pref.edit().putBoolean("Storage",false).apply();
                 }
-                temp=2;
-                //pickImage();
+                onResultTemp =2;
                 getImageFromAlbum();
             }
         });
     }
-
 
 
     public void checkPermission(String permission, int requestCode)
@@ -172,22 +154,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-    private void getImageFromAlbum(){
-        try{
-            Intent i = new Intent(Intent.ACTION_PICK,
-                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            startActivityForResult(i, RESULT_LOAD_IMAGE);
-        }catch(Exception exp){
-            Log.i("Error",exp.toString());
-        }
-    }
-
-
     @Override
     protected void onActivityResult(int reqCode, int resultCode, Intent data) {
         super.onActivityResult(reqCode, resultCode, data);
-        if(temp==2){
+        if(onResultTemp ==2){
             if (resultCode == RESULT_OK) {
                 try {
                     final Uri imageUri = data.getData();
@@ -207,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "You haven't picked Image",Toast.LENGTH_LONG).show();
             }
         }
-        else if(temp==1){
+        else if(onResultTemp ==1){
             File f = new File(currentPhotoPath);
             Uri contentUri = Uri.fromFile(f);
             Intent intent= new Intent(MainActivity.this, KameraYadaGaleri.class);
@@ -218,28 +188,15 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public static String encodeToBase64(Bitmap image) {
-        Bitmap immage = image;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        immage.compress(Bitmap.CompressFormat.PNG, 100, baos);
-        byte[] b = baos.toByteArray();
-        String imageEncoded = Base64.encodeToString(b, Base64.DEFAULT);
-
-        Log.d("Image Log:", imageEncoded);
-        return imageEncoded;
+    private void getImageFromAlbum(){
+        try{
+            Intent i = new Intent(Intent.ACTION_PICK,
+                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            startActivityForResult(i, RESULT_LOAD_IMAGE);
+        }catch(Exception exp){
+            Log.i("Error",exp.toString());
+        }
     }
-
-    private  void pickImage(){
-
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType("image/*");
-        startActivityForResult(intent, IMAGE_PICK_CODE);
-    }
-    private  void openCamera(){
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(intent, 1);
-    }
-
 
     private File createImageFile() throws IOException {
         // Create an image file name
@@ -287,6 +244,4 @@ public class MainActivity extends AppCompatActivity {
         mediaScanIntent.setData(contentUri);
         this.sendBroadcast(mediaScanIntent);
     }
-
-
 }

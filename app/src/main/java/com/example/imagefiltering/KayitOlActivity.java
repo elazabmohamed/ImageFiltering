@@ -79,6 +79,15 @@ public class KayitOlActivity extends AppCompatActivity {
             }
         });
 
+        btnGeri.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                Intent intent=new Intent(ActivityRegister.this,MainActivity.class);
+//                startActivity(intent);
+                onBackPressed();
+            }
+        });
+
     }
 
     private void LoadComponents(){
@@ -89,16 +98,5 @@ public class KayitOlActivity extends AppCompatActivity {
         tvMesajKayit=(TextView) findViewById(R.id.tvMesajKayit);
         btnKayitOlKayit=(Button) findViewById(R.id.btnKayitOlKayit);
         btnGeri = (Button) findViewById(R.id.btnGeri);
-
-
-        btnGeri.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                Intent intent=new Intent(ActivityRegister.this,MainActivity.class);
-//                startActivity(intent);
-                onBackPressed();
-            }
-        });
-
     }
 }

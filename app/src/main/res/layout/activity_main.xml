@@ -18,23 +18,30 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout3"
         app:layout_constraintVertical_bias="0.144"
-        app:srcCompat="@drawable/ic_baseline_add_circle_outline_24" />
+        app:srcCompat="@drawable/ic_baseline_add_circle_outline_24"
+        tools:ignore="VectorDrawableCompat" />
 
     <LinearLayout
         android:id="@+id/linearLayout3"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:gravity="right"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.005">
 
         <Button
-            android:alpha="0.7"
             android:id="@+id/btnGirisYap"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
             android:layout_weight="0"
+            android:alpha="0.7"
             android:text="Giriş Yap" />
 
         <ImageView

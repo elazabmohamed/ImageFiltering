@@ -62,7 +62,7 @@ public class GirisYapActivity extends AppCompatActivity {
         String password = etPassword.getText().toString().trim();
 
         if (username.equals("")) {
-            tvMessage.setText("Enter Your Username");
+            tvMessage.setText("Kullanıcı Adınızı giriniz");
             tvMessage.setVisibility(View.VISIBLE);
             tvMessage.setTextColor(Color.RED);
             etUserName.requestFocus();
@@ -70,30 +70,15 @@ public class GirisYapActivity extends AppCompatActivity {
         }
 
         if (password.equals("")) {
-            tvMessage.setText("Enter Your Password");
+            tvMessage.setText("Şifrenizi girin");
             tvMessage.setVisibility(View.VISIBLE);
             tvMessage.setTextColor(Color.RED);
             etPassword.requestFocus();
             return;
         }
 
-
-        //database
-//        if(username.equals("admin") && password.equals("12345")){
         if (UserDB.Login(username, password)) {
-
-//            tvMessage.setText("Welcome to Android..");
-//            tvMessage.setVisibility(View.VISIBLE);
-//            tvMessage.setTextColor(Color.GREEN);
-
-            // Intent homeactivity'ye username verisini text olarak gönderiyoruz
-
-//            Intent intent = new Intent(this,MainActivity.class);
-//            intent.putExtra("data", username);
-//
-//            startActivity(intent);
-
-            //      temporary code
+            //      temporary code to change the visibilty of giris yap buttton untill new activity is created
             MainActivity.btnGirisYap.setVisibility(View.GONE);
             onBackPressed();
         }

@@ -32,7 +32,8 @@
                 android:layout_height="match_parent"
                 android:layout_marginEnd="15dp"
                 android:layout_marginRight="15dp"
-                app:srcCompat="@drawable/info_image" />
+                app:srcCompat="@drawable/info_image"
+                tools:ignore="VectorDrawableCompat" />
 
             <ImageView
                 android:alpha="0.9"
@@ -41,7 +42,8 @@
                 android:layout_height="match_parent"
                 android:layout_marginEnd="15dp"
                 android:layout_marginRight="15dp"
-                app:srcCompat="@drawable/save_image" />
+                app:srcCompat="@drawable/save_image"
+                tools:ignore="VectorDrawableCompat" />
 
         </LinearLayout>
 
@@ -50,17 +52,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="0.25" />
-
-        <!--        <ImageView-->
-        <!--            android:id="@+id/imgViewDisplay"-->
-        <!--            android:layout_width="match_parent"-->
-        <!--            android:layout_height="514dp"-->
-        <!--            android:layout_centerHorizontal="true"-->
-        <!--            android:layout_centerVertical="true"-->
-        <!--            app:layout_constraintBottom_toTopOf="@+id/sb_value"-->
-        <!--            app:layout_constraintEnd_toEndOf="parent"-->
-        <!--            app:layout_constraintStart_toStartOf="parent"-->
-        <!--            app:layout_constraintTop_toTopOf="" />-->
 
         <HorizontalScrollView
             android:layout_width="match_parent"
@@ -86,7 +77,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        app:srcCompat="@drawable/tune_image" />
+                        app:srcCompat="@drawable/tune_image"
+                        tools:ignore="VectorDrawableCompat" />
 
                     <TextView
                         android:id="@+id/tvTuneImage"
@@ -110,7 +102,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        app:srcCompat="@drawable/photo_filter" />
+                        app:srcCompat="@drawable/photo_filter"
+                        tools:ignore="VectorDrawableCompat" />
 
                     <TextView
                         android:id="@+id/tvFilterImage"
@@ -134,7 +127,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        app:srcCompat="@drawable/crop_rotate" />
+                        app:srcCompat="@drawable/crop_rotate"
+                        tools:ignore="VectorDrawableCompat" />
 
                     <TextView
                         android:id="@+id/tvCropImage"
@@ -159,7 +153,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        app:srcCompat="@drawable/add_text" />
+                        app:srcCompat="@drawable/add_text"
+                        tools:ignore="VectorDrawableCompat" />
 
                     <TextView
                         android:id="@+id/tvTextImage"
@@ -184,7 +179,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        app:srcCompat="@drawable/draw_image" />
+                        app:srcCompat="@drawable/draw_image"
+                        tools:ignore="VectorDrawableCompat" />
 
                     <TextView
                         android:id="@+id/tvDrawImage"

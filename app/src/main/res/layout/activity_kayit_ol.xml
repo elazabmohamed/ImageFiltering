@@ -11,8 +11,10 @@
         android:layout_height="605dp"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        tools:layout_editor_absoluteX="2dp"
-        tools:layout_editor_absoluteY="-2dp">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <EditText
             android:id="@+id/etEmailKayit"
