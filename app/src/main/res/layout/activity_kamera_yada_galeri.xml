@@ -19,29 +19,30 @@
         android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/linearLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_height="50dp"
+            android:layout_weight="0"
             android:gravity="right"
             android:orientation="horizontal">
 
             <ImageView
-                android:alpha="0.5"
                 android:id="@+id/ivInfoImage"
                 android:layout_width="40dp"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="15dp"
                 android:layout_marginRight="15dp"
+                android:alpha="0.5"
                 app:srcCompat="@drawable/info_image"
                 tools:ignore="VectorDrawableCompat" />
 
             <ImageView
-                android:alpha="0.9"
                 android:id="@+id/ivSaveImage"
                 android:layout_width="40dp"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="15dp"
                 android:layout_marginRight="15dp"
+                android:alpha="0.9"
                 app:srcCompat="@drawable/save_image"
                 tools:ignore="VectorDrawableCompat" />
 
@@ -50,13 +51,14 @@
         <ImageView
             android:id="@+id/imgViewDisplay"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="0.25" />
+            android:layout_height="527dp"
+            android:layout_weight="0.50" />
 
         <HorizontalScrollView
+            android:id="@+id/horizontalScroll"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:layout_height="75dp"
+            android:layout_weight="0">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -194,5 +196,14 @@
         </HorizontalScrollView>
 
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/LayoutPop"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="0"
+        android:gravity="bottom"
+        android:orientation="vertical"
+        android:paddingBottom="100dp"></LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
