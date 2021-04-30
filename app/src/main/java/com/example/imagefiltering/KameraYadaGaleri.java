@@ -1,66 +1,164 @@
 package com.example.imagefiltering;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.constraintlayout.utils.widget.ImageFilterView;
 
-import android.content.Intent;
-import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 
 //package com.exclusive.original.whatsapp_photo_picker;
 
-import android.util.Base64;
-import android.util.Log;
-import android.view.MenuItem;
+import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupMenu;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.camerakit.CameraKitView;
+import com.mukesh.image_processing.ImageProcessor;
 
 import java.io.IOException;
-import java.net.URI;
-
 public class KameraYadaGaleri extends AppCompatActivity {
-    ImageView imgViewDisplay;
-    ImageView tuneImage;
+    ImageView  tuneImage, saveImage, infoImage, filterImage;
+    ImageFilterView imgViewDisplay;
     Boolean childTemp=false;
-    SeekBar sbBrightness;
-    TextView message;
+    SeekBar sbBrightness,sbSaturation,sbContrast;
+    TextView messageBr, messageSa, messageCo;
+    Uri uri;
+    int title=0;
+    Bitmap BitMap, bitmap, b, oneBitMap, twoBitMap, threeBitMap;
+    ImageProcessor processor = new ImageProcessor();
+
+
+    ImageView ivGrayScale, ivTint, ivSepia;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_kamera_yada_galeri);
         imgViewDisplay = findViewById(R.id.imgViewDisplay);
-        Uri uri = getIntent().getParcelableExtra("imageUri");
+        saveImage = findViewById(R.id.ivSaveImage);
+        infoImage = findViewById(R.id.ivInfoImage);
+        filterImage = findViewById(R.id.filterImage);
+
+        uri = getIntent().getParcelableExtra("imageUri");
         imgViewDisplay.setImageURI(uri);
-        tuneImage = findViewById(R.id.tuneImage);
+        tuneImage = findViewById(R.id.ivTint);
+        //bitmap = BitmapFactory.decodeResource(getResources(), R.id.imgViewDisplay);
+        try {
+            bitmap = MediaStore.Images.Media.getBitmap(KameraYadaGaleri.this.getContentResolver(), uri);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        LinearLayout ParentFilter =  findViewById(R.id.LayoutPop);
+        View childFilter = getLayoutInflater().inflate(R.layout.popup_menu_filter,null);
+
+        ivTint = childFilter.findViewById(R.id.ivTint);
+        oneBitMap = processor.tintImage(bitmap, 90);
+        ivTint.setImageBitmap(oneBitMap);
+
+
+        ivGrayScale = childFilter.findViewById(R.id.ivGrayScale);
+        twoBitMap = processor.doGreyScale(bitmap);
+        ivGrayScale.setImageBitmap(twoBitMap);
+
+        ivSepia = childFilter.findViewById(R.id.ivSepia);
+        threeBitMap = processor.createSepiaToningEffect(bitmap, 1, 2, 1, 5);
+        ivSepia.setImageBitmap(threeBitMap);
+
+
+
+
         LinearLayout Parent =  findViewById(R.id.LayoutPop);
         View child = getLayoutInflater().inflate(R.layout.popup_menu,null);
         sbBrightness = (SeekBar)  child.findViewById(R.id.sbBrightness);
-        sbBrightness.setProgress(0);
-        message = child.findViewById(R.id.tvBrightnessVal);
+       // sbBrightness.setProgress(0);
+        messageBr = child.findViewById(R.id.tvBrightnessVal);
+
+        sbSaturation = (SeekBar)  child.findViewById(R.id.sbSaturation);
+       // sbSaturation.setProgress(0);
+        messageSa = child.findViewById(R.id.tvSaturationVal);
+
+        sbContrast = (SeekBar)  child.findViewById(R.id.sbContrast);
+       // sbContrast.setProgress(0);
+        messageCo = child.findViewById(R.id.tvContrastVal);
+
+
+        infoImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    ImageInfo();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        saveImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    saveImageToGallery();
+                    Toast.makeText(KameraYadaGaleri.this,"Galeriye Kaydedildi.", Toast.LENGTH_LONG).show();
+                }
+                catch(Exception e){
+                    Toast.makeText(KameraYadaGaleri.this,"Galeriye Kaydedemedik.", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
         sbBrightness.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                imgViewDisplay.setColorFilter(setBrightness(progress));
-                //imgViewDisplay.setColorFilter();
-                message.setText(String.valueOf(progress));
-                //ImageInfo(uri);
+               // imgViewDisplay.setColorFilter(setBrightness(progress));
+                float percentage = (progress / 100.0f);
+                imgViewDisplay.setBrightness(percentage+1);
+                messageBr.setText(String.valueOf(progress));
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        sbContrast.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                float percentage = (progress / 100.0f);
+                imgViewDisplay.setContrast(percentage+1);
+                messageCo.setText(String.valueOf(progress));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        sbSaturation.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                float percentage = (progress / 100.0f);
+                imgViewDisplay.setSaturation(percentage+1);
+                messageSa.setText(String.valueOf(progress));
             }
 
             @Override
@@ -86,33 +184,103 @@ public class KameraYadaGaleri extends AppCompatActivity {
                 }
             }
         });
+
+        filterImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(childTemp==false) {
+                    ParentFilter.addView(childFilter);
+                    childTemp=true;
+                }
+                else{
+                    ParentFilter.removeAllViews();
+                    childTemp=false;
+                }
+            }
+        });
+
+        ivTint.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                imgViewDisplay.setDrawingCacheEnabled(true);
+                b = imgViewDisplay.getDrawingCache();
+                BitMap = processor.tintImage(b, 90);
+                imgViewDisplay.setImageBitmap(BitMap);
+
+            }
+        });
+        ivGrayScale.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                imgViewDisplay.setDrawingCacheEnabled(true);
+                b = imgViewDisplay.getDrawingCache();
+                BitMap = processor.doGreyScale(b);
+                imgViewDisplay.setImageBitmap(BitMap);
+
+            }
+        });
+
+        ivSepia.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                imgViewDisplay.setDrawingCacheEnabled(true);
+                b = imgViewDisplay.getDrawingCache();
+                BitMap = processor.createSepiaToningEffect(b, 1, 2, 1, 5);
+                imgViewDisplay.setImageBitmap(BitMap);
+            }
+        });
         }
-        
-public void ImageInfo(Uri uri) throws IOException {
-
-    ExifInterface exif = new ExifInterface(String.valueOf(uri));
-    exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE);
-    exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE_REF);
-    exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE);
-    exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF);
-
-    Toast.makeText(KameraYadaGaleri.this,exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE_REF) , Toast.LENGTH_SHORT);
-}
-
-    public static PorterDuffColorFilter setBrightness(int progress) {
-        if (progress >=    0)
-        {
-            int value = (int) (progress-51) * 255 / 51;
-
-            return new PorterDuffColorFilter(Color.argb(value, 255, 255, 255), PorterDuff.Mode.SRC_OVER);
-
-        }
-        else
-        {
-            int value = (int) (50-progress) * 255 / 50;
-            return new PorterDuffColorFilter(Color.argb(value, 0, 0, 0), PorterDuff.Mode.SRC_ATOP);
 
 
-        }
+
+    public void ImageInfo() throws IOException {
+        String mimeType = getContentResolver().getType(uri);
+
+        Cursor returnCursor =
+                getContentResolver().query(uri, null, null, null, null);
+
+        int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+        int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
+        returnCursor.moveToFirst();
+        AlertDialog.Builder builder
+                = new AlertDialog
+                .Builder(KameraYadaGaleri.this);
+
+        builder.setMessage("Dosya İsmi: "+returnCursor.getString(nameIndex)+'\n'+
+                            "Dosya Boyutu:"+Long.toString(returnCursor.getLong(sizeIndex)/1024)+"KB");
+        builder.setTitle("Özellikler:");
+        builder.show();
+        builder.setCancelable(false);
+    }
+
+//    public static PorterDuffColorFilter setBrightness(int progress) {
+//        if (progress >=    0)
+//        {
+//            int value = (int) (progress-51) * 255 / 51;
+//
+//            return new PorterDuffColorFilter(Color.argb(value, 255, 255, 255), PorterDuff.Mode.SRC_OVER);
+//
+//        }
+//        else
+//        {
+//            int value = (int) (50-progress) * 255 / 50;
+//            return new PorterDuffColorFilter(Color.argb(value, 0, 0, 0), PorterDuff.Mode.SRC_ATOP);
+//
+//
+//        }
+//    }
+
+
+
+    private void saveImageToGallery(){
+        imgViewDisplay.buildDrawingCache();
+        imgViewDisplay.setDrawingCacheEnabled(true);
+        Bitmap b = imgViewDisplay.getDrawingCache();
+        title++;
+        MediaStore.Images.Media.insertImage(KameraYadaGaleri.this.getContentResolver(), b,String.valueOf(title), "imageimage");
+        imgViewDisplay.destroyDrawingCache();
     }
     }
