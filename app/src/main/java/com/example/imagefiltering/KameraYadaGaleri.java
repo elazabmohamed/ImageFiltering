@@ -30,11 +30,11 @@ public class KameraYadaGaleri extends AppCompatActivity {
     TextView messageBr, messageSa, messageCo;
     Uri uri;
     int title=0;
-    Bitmap BitMap, bitmap, b, oneBitMap, twoBitMap, threeBitMap;
+    Bitmap BitMap, bitmap, b, zeroBitmap, oneBitMap, twoBitMap, threeBitMap;
     ImageProcessor processor = new ImageProcessor();
 
 
-    ImageView ivGrayScale, ivTint, ivSnow;
+    ImageView ivOrg, ivGrayScale, ivTint, ivSnow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +58,9 @@ public class KameraYadaGaleri extends AppCompatActivity {
 
         LinearLayout ParentFilter =  findViewById(R.id.LayoutPop);
         View childFilter = getLayoutInflater().inflate(R.layout.popup_menu_filter,null);
+
+        ivOrg = childFilter.findViewById(R.id.ivOrg);
+        ivOrg.setImageBitmap(bitmap);
 
         ivTint = childFilter.findViewById(R.id.ivTint);
         oneBitMap = processor.tintImage(bitmap, 90);
@@ -195,14 +198,19 @@ public class KameraYadaGaleri extends AppCompatActivity {
                 }
             }
         });
-
+        ivOrg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imgViewDisplay.setImageBitmap(bitmap);
+            }
+        });
         ivTint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                imgViewDisplay.setDrawingCacheEnabled(true);
-                b = imgViewDisplay.getDrawingCache();
-                BitMap = processor.tintImage(b, 90);
+                //imgViewDisplay.setDrawingCacheEnabled(true);
+                //b = imgViewDisplay.getDrawingCache();
+                BitMap = processor.tintImage(bitmap, 90);
                 imgViewDisplay.setImageBitmap(BitMap);
 
             }
@@ -211,9 +219,9 @@ public class KameraYadaGaleri extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                imgViewDisplay.setDrawingCacheEnabled(true);
-                b = imgViewDisplay.getDrawingCache();
-                BitMap = processor.doGreyScale(b);
+               //imgViewDisplay.setDrawingCacheEnabled(true);
+                //b = imgViewDisplay.getDrawingCache();
+                BitMap = processor.doGreyScale(bitmap);
                 imgViewDisplay.setImageBitmap(BitMap);
 
             }
@@ -223,9 +231,9 @@ public class KameraYadaGaleri extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                imgViewDisplay.setDrawingCacheEnabled(true);
-                b = imgViewDisplay.getDrawingCache();
-                BitMap = processor.applySnowEffect(b);
+               // imgViewDisplay.setDrawingCacheEnabled(true);
+              //  b = imgViewDisplay.getDrawingCache();
+                BitMap = processor.applySnowEffect(bitmap);
                 imgViewDisplay.setImageBitmap(BitMap);
             }
         });

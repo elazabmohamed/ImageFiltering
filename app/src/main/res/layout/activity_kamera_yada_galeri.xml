@@ -19,6 +19,12 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <androidx.constraintlayout.utils.widget.ImageFilterView
+            android:id="@+id/imgViewDisplay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" />
+
         <LinearLayout
             android:id="@+id/linearLayout"
             android:layout_width="match_parent"
@@ -48,12 +54,6 @@
                 tools:ignore="VectorDrawableCompat" />
 
         </LinearLayout>
-
-        <androidx.constraintlayout.utils.widget.ImageFilterView
-            android:id="@+id/imgViewDisplay"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"/>
 
         <HorizontalScrollView
             android:id="@+id/horizontalScrollFilter"

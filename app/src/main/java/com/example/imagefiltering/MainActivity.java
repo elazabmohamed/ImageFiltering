@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private static int RESULT_LOAD_IMAGE = 1;
     private static int REQUEST_IMAGE_CAPTURE = 1;
     String currentPhotoPath;
+    Intent intent;
     private static final int CAMERA_PERMISSION_CODE = 100;
     private static final int STORAGE_PERMISSION_CODE = 101;
     private static int onResultTemp =0;
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
         imageCamera = findViewById(R.id.imageCamera);
         imageGaleri = findViewById(R.id.imageGaleri);
 
+        intent= new Intent(MainActivity.this, KameraYadaGaleri.class);
         SharedPreferences pref = this.getSharedPreferences("PACKAGE.NAME", MODE_PRIVATE);
         Boolean firstTime = pref.getBoolean("Camera",true);
         Boolean firstTime2 = pref.getBoolean("Storage",true);
@@ -163,7 +165,6 @@ public class MainActivity extends AppCompatActivity {
                     final Uri imageUri = data.getData();
                     final InputStream imageStream = getContentResolver().openInputStream(imageUri);
                     final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-                    Intent intent= new Intent(MainActivity.this, KameraYadaGaleri.class);
                     intent.putExtra("imageUri", imageUri);
                     startActivity(intent);
 
@@ -180,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
         else if(onResultTemp ==1){
             File f = new File(currentPhotoPath);
             Uri contentUri = Uri.fromFile(f);
-            Intent intent= new Intent(MainActivity.this, KameraYadaGaleri.class);
+            //Intent intent= new Intent(MainActivity.this, KameraYadaGaleri.class);
             intent.putExtra("imageUri", contentUri);
             startActivity(intent);
 
