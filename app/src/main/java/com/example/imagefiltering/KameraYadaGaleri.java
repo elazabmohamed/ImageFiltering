@@ -6,9 +6,6 @@ import androidx.constraintlayout.utils.widget.ImageFilterView;
 
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -37,7 +34,7 @@ public class KameraYadaGaleri extends AppCompatActivity {
     ImageProcessor processor = new ImageProcessor();
 
 
-    ImageView ivGrayScale, ivTint, ivSepia;
+    ImageView ivGrayScale, ivTint, ivSnow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,9 +68,9 @@ public class KameraYadaGaleri extends AppCompatActivity {
         twoBitMap = processor.doGreyScale(bitmap);
         ivGrayScale.setImageBitmap(twoBitMap);
 
-        ivSepia = childFilter.findViewById(R.id.ivSepia);
-        threeBitMap = processor.createSepiaToningEffect(bitmap, 1, 2, 1, 5);
-        ivSepia.setImageBitmap(threeBitMap);
+        ivSnow = childFilter.findViewById(R.id.ivSnow);
+        threeBitMap = processor.applySnowEffect(bitmap);
+        ivSnow.setImageBitmap(threeBitMap);
 
 
 
@@ -222,13 +219,13 @@ public class KameraYadaGaleri extends AppCompatActivity {
             }
         });
 
-        ivSepia.setOnClickListener(new View.OnClickListener() {
+        ivSnow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 imgViewDisplay.setDrawingCacheEnabled(true);
                 b = imgViewDisplay.getDrawingCache();
-                BitMap = processor.createSepiaToningEffect(b, 1, 2, 1, 5);
+                BitMap = processor.applySnowEffect(b);
                 imgViewDisplay.setImageBitmap(BitMap);
             }
         });
