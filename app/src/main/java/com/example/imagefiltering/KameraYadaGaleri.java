@@ -3,16 +3,19 @@ package com.example.imagefiltering;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.utils.widget.ImageFilterView;
+import androidx.core.content.FileProvider;
 
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 
 //package com.exclusive.original.whatsapp_photo_picker;
 
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.view.View;
@@ -22,30 +25,45 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.mukesh.image_processing.ImageProcessor;
+import com.theartofdev.edmodo.cropper.CropImage;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 
 public class KameraYadaGaleri extends AppCompatActivity {
-    ImageView  tuneImage, saveImage, infoImage, filterImage;
+    ImageView  tuneImage, saveImage, infoImage, filterImage, cropImage;
     ImageFilterView imgViewDisplay;
     Boolean childTemp=false;
     SeekBar sbBrightness,sbSaturation,sbContrast;
     TextView messageBr, messageSa, messageCo;
-    Uri uri;
+    Uri uri, uriCrop, resultUri;
     int title=0;
-    Bitmap BitMap, bitmap, b, zeroBitmap, oneBitMap, twoBitMap, threeBitMap, fourthBitmap, fifthBitmap, sixthBitmap, resized;
+    Bitmap BitMap;
+    Bitmap bitmap;
+    Bitmap b;
+    Bitmap zeroBitmap;
+    Bitmap oneBitMap;
+    Bitmap twoBitMap;
+    Bitmap threeBitMap;
+    Bitmap fourthBitmap;
+    Bitmap fifthBitmap;
+    Bitmap sixthBitmap;
+    Bitmap resized;
     ImageProcessor processor = new ImageProcessor();
 
     ImageView ivOrg, ivGrayScale, ivTint, ivSnow, ivEngrave, ivShadow, ivFlea;
     LinearLayout ParentFilter;
     View childFilter;
 
-    Intent intentLoading;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +75,7 @@ public class KameraYadaGaleri extends AppCompatActivity {
         saveImage = findViewById(R.id.ivSaveImage);
         infoImage = findViewById(R.id.ivInfoImage);
         filterImage = findViewById(R.id.filterImage);
+        cropImage = findViewById(R.id.cropImage);
 
         uri = getIntent().getParcelableExtra("imageUri");
         imgViewDisplay.setImageURI(uri);
@@ -72,7 +91,7 @@ public class KameraYadaGaleri extends AppCompatActivity {
 
 
         ParentFilter =  findViewById(R.id.LayoutPop);
-         childFilter = getLayoutInflater().inflate(R.layout.popup_menu_filter,null);
+        childFilter = getLayoutInflater().inflate(R.layout.popup_menu_filter,null);
 
 
         LinearLayout Parent =  findViewById(R.id.LayoutPop);
@@ -89,7 +108,7 @@ public class KameraYadaGaleri extends AppCompatActivity {
        // sbContrast.setProgress(0);
         messageCo = child.findViewById(R.id.tvContrastVal);
 
-
+        LoadComponents();
         infoImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -196,7 +215,22 @@ public class KameraYadaGaleri extends AppCompatActivity {
             }
         });
 
-        }
+        cropImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+
+//               // MediaStore.Images.Media.insertImage(KameraYadaGaleri.this.getContentResolver(), BitMap,String.valueOf("Bitmap"), "imageimage");
+//
+//                Uri contentUri = Uri.fromFile(filee);
+                uriCrop = getImageUri(getApplicationContext(),BitMap);
+                CropImage.activity(uriCrop)
+                        .start(KameraYadaGaleri.this);
+            }
+        });
+
+    }
 
 
     @Override
@@ -214,18 +248,38 @@ public class KameraYadaGaleri extends AppCompatActivity {
 //        }).start();
 
 
-        LoadComponents();
+//        LoadComponents();
 
     }
 
-//    @Override
-//    protected void onResume()
-//    {
-//        // TODO Auto-generated method stub
-//        super.onResume();
-//        LoadComponents();
-//    }
 
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                resultUri = result.getUri();
+                imgViewDisplay.setImageURI(resultUri);
+                //      Function to update bitmap thumbnails
+
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+            }
+        }
+    }
+
+
+
+
+
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        //inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
+    }
     public void ImageInfo() throws IOException {
         String mimeType = getContentResolver().getType(uri);
 
