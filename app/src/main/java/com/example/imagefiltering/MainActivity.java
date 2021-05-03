@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         imageGaleri = findViewById(R.id.imageGaleri);
 
         intent= new Intent(MainActivity.this, KameraYadaGaleri.class);
+
         SharedPreferences pref = this.getSharedPreferences("PACKAGE.NAME", MODE_PRIVATE);
         Boolean firstTime = pref.getBoolean("Camera",true);
         Boolean firstTime2 = pref.getBoolean("Storage",true);

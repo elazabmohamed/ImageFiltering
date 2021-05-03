@@ -115,6 +115,78 @@
                     android:text="Snow" />
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="15dp"
+                android:layout_marginLeft="15dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/ivEngrave"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    tools:ignore="VectorDrawableCompat" />
+
+                <TextView
+                    android:id="@+id/tvEngrave"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:text="Engrave" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="15dp"
+                android:layout_marginLeft="15dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/ivShadow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    tools:ignore="VectorDrawableCompat" />
+
+                <TextView
+                    android:id="@+id/tvShadow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:text="Shadow" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="15dp"
+                android:layout_marginLeft="15dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/ivFlea"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    tools:ignore="VectorDrawableCompat" />
+
+                <TextView
+                    android:id="@+id/tvFlea"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:text="Flea" />
+            </LinearLayout>
+
 
         </LinearLayout>
     </HorizontalScrollView>

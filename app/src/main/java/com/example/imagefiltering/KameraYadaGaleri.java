@@ -4,6 +4,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.utils.widget.ImageFilterView;
 
+import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -19,9 +21,15 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.mukesh.image_processing.ImageProcessor;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+
 public class KameraYadaGaleri extends AppCompatActivity {
     ImageView  tuneImage, saveImage, infoImage, filterImage;
     ImageFilterView imgViewDisplay;
@@ -30,16 +38,21 @@ public class KameraYadaGaleri extends AppCompatActivity {
     TextView messageBr, messageSa, messageCo;
     Uri uri;
     int title=0;
-    Bitmap BitMap, bitmap, b, zeroBitmap, oneBitMap, twoBitMap, threeBitMap;
+    Bitmap BitMap, bitmap, b, zeroBitmap, oneBitMap, twoBitMap, threeBitMap, fourthBitmap, fifthBitmap, sixthBitmap, resized;
     ImageProcessor processor = new ImageProcessor();
 
+    ImageView ivOrg, ivGrayScale, ivTint, ivSnow, ivEngrave, ivShadow, ivFlea;
+    LinearLayout ParentFilter;
+    View childFilter;
 
-    ImageView ivOrg, ivGrayScale, ivTint, ivSnow;
-
+    Intent intentLoading;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_kamera_yada_galeri);
+
+
+
         imgViewDisplay = findViewById(R.id.imgViewDisplay);
         saveImage = findViewById(R.id.ivSaveImage);
         infoImage = findViewById(R.id.ivInfoImage);
@@ -51,31 +64,15 @@ public class KameraYadaGaleri extends AppCompatActivity {
         //bitmap = BitmapFactory.decodeResource(getResources(), R.id.imgViewDisplay);
         try {
             bitmap = MediaStore.Images.Media.getBitmap(KameraYadaGaleri.this.getContentResolver(), uri);
+
+            resized = Bitmap.createScaledBitmap(bitmap,(int)(bitmap.getWidth()*0.8), (int)(bitmap.getHeight()*0.8), true);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
 
-        LinearLayout ParentFilter =  findViewById(R.id.LayoutPop);
-        View childFilter = getLayoutInflater().inflate(R.layout.popup_menu_filter,null);
-
-        ivOrg = childFilter.findViewById(R.id.ivOrg);
-        ivOrg.setImageBitmap(bitmap);
-
-        ivTint = childFilter.findViewById(R.id.ivTint);
-        oneBitMap = processor.tintImage(bitmap, 90);
-        ivTint.setImageBitmap(oneBitMap);
-
-
-        ivGrayScale = childFilter.findViewById(R.id.ivGrayScale);
-        twoBitMap = processor.doGreyScale(bitmap);
-        ivGrayScale.setImageBitmap(twoBitMap);
-
-        ivSnow = childFilter.findViewById(R.id.ivSnow);
-        threeBitMap = processor.applySnowEffect(bitmap);
-        ivSnow.setImageBitmap(threeBitMap);
-
-
+        ParentFilter =  findViewById(R.id.LayoutPop);
+         childFilter = getLayoutInflater().inflate(R.layout.popup_menu_filter,null);
 
 
         LinearLayout Parent =  findViewById(R.id.LayoutPop);
@@ -198,48 +195,36 @@ public class KameraYadaGaleri extends AppCompatActivity {
                 }
             }
         });
-        ivOrg.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                imgViewDisplay.setImageBitmap(bitmap);
-            }
-        });
-        ivTint.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-                //imgViewDisplay.setDrawingCacheEnabled(true);
-                //b = imgViewDisplay.getDrawingCache();
-                BitMap = processor.tintImage(bitmap, 90);
-                imgViewDisplay.setImageBitmap(BitMap);
-
-            }
-        });
-        ivGrayScale.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-               //imgViewDisplay.setDrawingCacheEnabled(true);
-                //b = imgViewDisplay.getDrawingCache();
-                BitMap = processor.doGreyScale(bitmap);
-                imgViewDisplay.setImageBitmap(BitMap);
-
-            }
-        });
-
-        ivSnow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-               // imgViewDisplay.setDrawingCacheEnabled(true);
-              //  b = imgViewDisplay.getDrawingCache();
-                BitMap = processor.applySnowEffect(bitmap);
-                imgViewDisplay.setImageBitmap(BitMap);
-            }
-        });
         }
 
 
+    @Override
+    protected void onStart()
+    {
+        // TODO Auto-generated method stub
+        super.onStart();
+//        intentLoading= new Intent(KameraYadaGaleri.this, LoadingActivity.class);;
+//        startActivity(intentLoading);
+
+//        new Thread(new Runnable() {
+//            public void run(){
+//                LoadComponents();
+//            }
+//        }).start();
+
+
+        LoadComponents();
+
+    }
+
+//    @Override
+//    protected void onResume()
+//    {
+//        // TODO Auto-generated method stub
+//        super.onResume();
+//        LoadComponents();
+//    }
 
     public void ImageInfo() throws IOException {
         String mimeType = getContentResolver().getType(uri);
@@ -288,4 +273,99 @@ public class KameraYadaGaleri extends AppCompatActivity {
         MediaStore.Images.Media.insertImage(KameraYadaGaleri.this.getContentResolver(), b,String.valueOf(title), "imageimage");
         imgViewDisplay.destroyDrawingCache();
     }
+
+
+    private void LoadComponents() {
+
+        ivOrg = childFilter.findViewById(R.id.ivOrg);
+        ivOrg.setImageBitmap(resized);
+
+        ivTint = childFilter.findViewById(R.id.ivTint);
+        oneBitMap = processor.tintImage(resized, 90);
+        ivTint.setImageBitmap(oneBitMap);
+
+        ivGrayScale = childFilter.findViewById(R.id.ivGrayScale);
+        twoBitMap = processor.doGreyScale(resized);
+        ivGrayScale.setImageBitmap(twoBitMap);
+
+        ivSnow = childFilter.findViewById(R.id.ivSnow);
+        threeBitMap = processor.applySnowEffect(resized);
+        ivSnow.setImageBitmap(threeBitMap);
+
+        ivEngrave = childFilter.findViewById(R.id.ivEngrave);
+        fourthBitmap = processor.engrave(resized);
+        ivEngrave.setImageBitmap(fourthBitmap);
+
+        ivShadow = childFilter.findViewById(R.id.ivShadow);
+        fifthBitmap = processor.createShadow(resized);
+        ivShadow.setImageBitmap(fifthBitmap);
+
+        ivFlea = childFilter.findViewById(R.id.ivFlea);
+        sixthBitmap = processor.applyFleaEffect(resized);
+        ivFlea.setImageBitmap(sixthBitmap);
+        setOnclickListeners();
+
     }
+
+    private void setOnclickListeners(){
+        ivOrg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imgViewDisplay.setImageBitmap(bitmap);
+            }
+        });
+        ivTint.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //imgViewDisplay.setDrawingCacheEnabled(true);
+                //b = imgViewDisplay.getDrawingCache();
+                BitMap = processor.tintImage(bitmap, 90);
+                imgViewDisplay.setImageBitmap(BitMap);
+
+            }
+        });
+        ivGrayScale.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //imgViewDisplay.setDrawingCacheEnabled(true);
+                //b = imgViewDisplay.getDrawingCache();
+                BitMap = processor.doGreyScale(bitmap);
+                imgViewDisplay.setImageBitmap(BitMap);
+
+            }
+        });
+        ivSnow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // imgViewDisplay.setDrawingCacheEnabled(true);
+                //  b = imgViewDisplay.getDrawingCache();
+                BitMap = processor.applySnowEffect(bitmap);
+                imgViewDisplay.setImageBitmap(BitMap);
+            }
+        });
+        ivEngrave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BitMap = processor.engrave(bitmap);
+                imgViewDisplay.setImageBitmap(BitMap);
+            }
+        });
+        ivShadow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BitMap = processor.createShadow(bitmap);
+                imgViewDisplay.setImageBitmap(BitMap);
+            }
+        });
+        ivFlea.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BitMap = processor.applyFleaEffect(bitmap);
+                imgViewDisplay.setImageBitmap(BitMap);
+            }
+        });
+    }
+}
