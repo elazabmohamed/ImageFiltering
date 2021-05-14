@@ -5,11 +5,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.utils.widget.ImageFilterView;
 import androidx.core.content.FileProvider;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -18,7 +24,11 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -39,7 +49,7 @@ import java.util.Date;
 
 
 public class KameraYadaGaleri extends AppCompatActivity {
-    ImageView  tuneImage, saveImage, infoImage, filterImage, cropImage;
+    ImageView  tuneImage, saveImage, infoImage, filterImage, cropImage, textImage;
     ImageFilterView imgViewDisplay;
     Boolean childTemp=false;
     SeekBar sbBrightness,sbSaturation,sbContrast;
@@ -56,13 +66,15 @@ public class KameraYadaGaleri extends AppCompatActivity {
     Bitmap fourthBitmap;
     Bitmap fifthBitmap;
     Bitmap sixthBitmap;
+    Bitmap workingBitmap;
     Bitmap resized;
     ImageProcessor processor = new ImageProcessor();
-
+    float someGlobalXvariable, someGlobalYvariable;
     ImageView ivOrg, ivGrayScale, ivTint, ivSnow, ivEngrave, ivShadow, ivFlea;
     LinearLayout ParentFilter;
     View childFilter;
-
+    EditText etAddText;
+    Button btnAddText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +88,7 @@ public class KameraYadaGaleri extends AppCompatActivity {
         infoImage = findViewById(R.id.ivInfoImage);
         filterImage = findViewById(R.id.filterImage);
         cropImage = findViewById(R.id.cropImage);
+        textImage = findViewById(R.id.textImage);
 
         uri = getIntent().getParcelableExtra("imageUri");
         imgViewDisplay.setImageURI(uri);
@@ -96,6 +109,11 @@ public class KameraYadaGaleri extends AppCompatActivity {
 
         LinearLayout Parent =  findViewById(R.id.LayoutPop);
         View child = getLayoutInflater().inflate(R.layout.popup_menu,null);
+
+        View childText = getLayoutInflater().inflate(R.layout.popup_menu_text,null);
+        etAddText = childText.findViewById(R.id.etAddText);
+        btnAddText = childText.findViewById(R.id.btnAddText);
+
         sbBrightness = (SeekBar)  child.findViewById(R.id.sbBrightness);
        // sbBrightness.setProgress(0);
         messageBr = child.findViewById(R.id.tvBrightnessVal);
@@ -230,8 +248,59 @@ public class KameraYadaGaleri extends AppCompatActivity {
             }
         });
 
-    }
+        textImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Parent.addView(childText);
 
+                PosTouch();
+
+            }
+        });
+
+    }
+@SuppressLint("ClickableViewAccessibility")
+private void PosTouch(){
+
+
+
+    btnAddText.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+//            canvas.drawText(String.valueOf(etAddText.getText()), imgViewDisplay.getX()/2, imgViewDisplay.getY()/2, paint);
+
+        }
+    });
+
+    imgViewDisplay.setOnTouchListener( new View.OnTouchListener(){
+
+        public boolean onTouch(View v, MotionEvent e) {
+            //Bitmap workingBitmap = Bitmap.createBitmap(bitmap);
+            Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+
+            Canvas canvas = new Canvas(mutableBitmap);
+
+//                Canvas canvas = new Canvas(bitmap);
+            Paint paint = new Paint();
+            paint.setColor(Color.TRANSPARENT);
+            paint.setStyle(Paint.Style.FILL);
+            canvas.drawPaint(paint);
+
+            someGlobalXvariable = e.getX();
+            someGlobalYvariable = e.getY();
+
+
+            paint.setColor(Color.BLACK);
+            paint.setTextSize(100);
+            canvas.drawText(String.valueOf(etAddText.getText()), someGlobalXvariable, someGlobalYvariable, paint);
+            imgViewDisplay.setImageBitmap(mutableBitmap);
+
+            return true;
+        }
+
+    });
+
+}
 
     @Override
     protected void onStart()
