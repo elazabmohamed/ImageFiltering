@@ -66,10 +66,19 @@ public class KameraYadaGaleri extends AppCompatActivity {
     View childFilter, child,childText, childDraw;
     EditText etAddText;
     Button btnAddText;
+
+    Canvas canvas;
+    Paint paint;
+    float downx = 0, downy = 0, upx = 0, upy = 0;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_kamera_yada_galeri);
+
+
+
 
 
         imgViewDisplay = findViewById(R.id.imgViewDisplay);
@@ -86,8 +95,8 @@ public class KameraYadaGaleri extends AppCompatActivity {
         //bitmap = BitmapFactory.decodeResource(getResources(), R.id.imgViewDisplay);
         try {
 
-            bitmap = MediaStore.Images.Media.getBitmap(KameraYadaGaleri.this.getContentResolver(), uri);
-            //bitmap = mutableBitmap.copy(Bitmap.Config.ARGB_8888, true);
+            mutableBitmap = MediaStore.Images.Media.getBitmap(KameraYadaGaleri.this.getContentResolver(), uri);
+            bitmap = mutableBitmap.copy(Bitmap.Config.ARGB_8888, true);
 
 
             resized = Bitmap.createScaledBitmap(bitmap,(int)(bitmap.getWidth()*0.8), (int)(bitmap.getHeight()*0.8), true);
@@ -98,7 +107,7 @@ public class KameraYadaGaleri extends AppCompatActivity {
 
         Parent =  findViewById(R.id.LayoutPop);
         childFilter = getLayoutInflater().inflate(R.layout.popup_menu_filter,null);
-        childDraw = getLayoutInflater().inflate(R.layout.activity_draw,null);
+        //childDraw = getLayoutInflater().inflate(R.layout.activity_draw,null);
 
         //LinearLayout Parent =  findViewById(R.id.LayoutPop);
          child = getLayoutInflater().inflate(R.layout.popup_menu,null);
@@ -118,6 +127,10 @@ public class KameraYadaGaleri extends AppCompatActivity {
         sbContrast = (SeekBar)  child.findViewById(R.id.sbContrast);
        // sbContrast.setProgress(0);
         messageCo = child.findViewById(R.id.tvContrastVal);
+
+
+
+
 
         LoadComponents();
         infoImage.setOnClickListener(new View.OnClickListener() {
@@ -224,6 +237,7 @@ public class KameraYadaGaleri extends AppCompatActivity {
                     childTemp=false;
                 }
             }
+
         });
 
         cropImage.setOnClickListener(new View.OnClickListener() {
@@ -257,7 +271,36 @@ public class KameraYadaGaleri extends AppCompatActivity {
 
                 if(childTemp==false) {
                     Parent.addView(childText);
-                    PosTouch();
+                    imgViewDisplay.setOnTouchListener( new View.OnTouchListener(){
+
+                        public boolean onTouch(View v, MotionEvent e) {
+                            //Bitmap workingBitmap = Bitmap.createBitmap(bitmap);
+                            //Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+
+//            bitmap = Bitmap.createBitmap(bitmap);
+//            bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+                            Canvas canvas = new Canvas(BitMap);
+
+//                Canvas canvas = new Canvas(bitmap);
+                            Paint paint = new Paint();
+                            paint.setColor(Color.TRANSPARENT);
+                            paint.setStyle(Paint.Style.FILL);
+                            canvas.drawPaint(paint);
+
+                            someGlobalXvariable = e.getX();
+                            someGlobalYvariable = e.getY();
+
+
+                            paint.setColor(Color.BLACK);
+                            paint.setTextSize(100);
+                            canvas.drawText(String.valueOf(etAddText.getText()), someGlobalXvariable, someGlobalYvariable, paint);
+                            imgViewDisplay.setImageBitmap(BitMap);
+
+                            return true;
+
+//            imgViewDisplay.setImageBitmap(mark(BitMap,String.valueOf(etAddText.getText()), someGlobalXvariable, someGlobalYvariable,100));}
+                        }
+                    });
                     childTemp=true;
                 }
                 else{
@@ -269,11 +312,14 @@ public class KameraYadaGaleri extends AppCompatActivity {
         });
 
         drawImage.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
 
+
                 if(childTemp==false) {
-                    Parent.addView(childDraw);
+                    //Parent.addView(childDraw);
+
                     childTemp=true;
                 }
                 else{
@@ -281,8 +327,44 @@ public class KameraYadaGaleri extends AppCompatActivity {
                     childTemp=false;
                 }
 
-
             }
+        });
+        //bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+        imgViewDisplay.setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                canvas = new Canvas(BitMap);
+                paint = new Paint();
+                paint.setColor(Color.GREEN);
+
+                int action = event.getAction();
+                switch (action) {
+                    case MotionEvent.ACTION_DOWN:
+                        downx = event.getX();
+                        downy = event.getY();
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        upx = event.getX();
+                        upy = event.getY();
+                        canvas.drawLine(downx, downy, upx, upy, paint);
+                        imgViewDisplay.invalidate();
+                        break;
+                    case MotionEvent.ACTION_CANCEL:
+                        break;
+                    default:
+                        break;
+
+
+                }
+                imgViewDisplay.setImageBitmap(BitMap);
+                //setOnclickListeners();
+                return true;
+            }
+
+
         });
 
     }
@@ -299,38 +381,7 @@ private void PosTouch(){
         }
     });
 
-    imgViewDisplay.setOnTouchListener( new View.OnTouchListener(){
 
-        public boolean onTouch(View v, MotionEvent e) {
-            //Bitmap workingBitmap = Bitmap.createBitmap(bitmap);
-            //Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
-
-//            bitmap = Bitmap.createBitmap(bitmap);
-//            bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
-//            Canvas canvas = new Canvas(bitmap);
-//
-////                Canvas canvas = new Canvas(bitmap);
-//            Paint paint = new Paint();
-//            paint.setColor(Color.TRANSPARENT);
-//            paint.setStyle(Paint.Style.FILL);
-//            canvas.drawPaint(paint);
-//
-//            someGlobalXvariable = e.getX();
-//            someGlobalYvariable = e.getY();
-//
-//
-//            paint.setColor(Color.BLACK);
-//            paint.setTextSize(100);
-//            canvas.drawText(String.valueOf(etAddText.getText()), someGlobalXvariable, someGlobalYvariable, paint);
-//            imgViewDisplay.setImageBitmap(bitmap);
-//
-//            return true;
-
-            imgViewDisplay.setImageBitmap(mark(bitmap,String.valueOf(etAddText.getText()), someGlobalXvariable, someGlobalYvariable,100));
-            return true;
-        }
-
-    });
 
 }
     @Override
