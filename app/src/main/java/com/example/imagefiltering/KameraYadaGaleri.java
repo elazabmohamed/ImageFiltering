@@ -12,7 +12,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -22,7 +21,6 @@ import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -38,48 +36,39 @@ import java.io.IOException;
 
 
 public class KameraYadaGaleri extends AppCompatActivity {
-    ImageView  tuneImage, saveImage, infoImage, filterImage, cropImage, textImage, drawImage;
+    ImageView  tuneImage, saveImage, infoImage, filterImage, cropImage, textImage,
+               drawImage, ivOrg, ivGrayScale, ivTint, ivSnow, ivEngrave, ivShadow, ivFlea;
     ImageFilterView imgViewDisplay;
+    LinearLayout Parent;
+    View childFilter, child,childText;
+    EditText etAddText;
     Boolean childTemp=false;
     SeekBar sbBrightness,sbSaturation,sbContrast;
     TextView messageBr, messageSa, messageCo;
     Uri uri, uriCrop, resultUri;
     int title=0;
+    float someGlobalXvariable, someGlobalYvariable;
+    float downx = 0, downy = 0, upx = 0, upy = 0;
+    ImageProcessor processor = new ImageProcessor();
+
     Bitmap BitMap;
     Bitmap bitmap;
-    Bitmap b;
-    Bitmap zeroBitmap;
     Bitmap oneBitMap;
     Bitmap twoBitMap;
     Bitmap threeBitMap;
     Bitmap fourthBitmap;
     Bitmap fifthBitmap;
     Bitmap sixthBitmap;
-
     Bitmap mutableBitmap;
-
+    Bitmap BitmapText;
     Bitmap resized;
-    ImageProcessor processor = new ImageProcessor();
-    float someGlobalXvariable, someGlobalYvariable;
-    ImageView ivOrg, ivGrayScale, ivTint, ivSnow, ivEngrave, ivShadow, ivFlea;
-    LinearLayout Parent;
-    View childFilter, child,childText, childDraw;
-    EditText etAddText;
-    Button btnAddText;
 
-    Canvas canvas;
-    Paint paint;
-    float downx = 0, downy = 0, upx = 0, upy = 0;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_kamera_yada_galeri);
-
-
-
-
 
         imgViewDisplay = findViewById(R.id.imgViewDisplay);
         saveImage = findViewById(R.id.ivSaveImage);
@@ -88,54 +77,45 @@ public class KameraYadaGaleri extends AppCompatActivity {
         cropImage = findViewById(R.id.cropImage);
         textImage = findViewById(R.id.textImage);
         drawImage = findViewById(R.id.drawImage);
+        tuneImage = findViewById(R.id.ivTint);
 
         uri = getIntent().getParcelableExtra("imageUri");
         imgViewDisplay.setImageURI(uri);
-        tuneImage = findViewById(R.id.ivTint);
-        //bitmap = BitmapFactory.decodeResource(getResources(), R.id.imgViewDisplay);
         try {
-
             mutableBitmap = MediaStore.Images.Media.getBitmap(KameraYadaGaleri.this.getContentResolver(), uri);
             bitmap = mutableBitmap.copy(Bitmap.Config.ARGB_8888, true);
-
-
             resized = Bitmap.createScaledBitmap(bitmap,(int)(bitmap.getWidth()*0.8), (int)(bitmap.getHeight()*0.8), true);
+            BitMap = Bitmap.createBitmap(bitmap);
+            BitmapText = Bitmap.createBitmap(bitmap);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
 
+
         Parent =  findViewById(R.id.LayoutPop);
+
         childFilter = getLayoutInflater().inflate(R.layout.popup_menu_filter,null);
-        //childDraw = getLayoutInflater().inflate(R.layout.activity_draw,null);
+        child = getLayoutInflater().inflate(R.layout.popup_menu,null);
 
-        //LinearLayout Parent =  findViewById(R.id.LayoutPop);
-         child = getLayoutInflater().inflate(R.layout.popup_menu,null);
-
-         childText = getLayoutInflater().inflate(R.layout.popup_menu_text,null);
+        childText = getLayoutInflater().inflate(R.layout.popup_menu_text,null);
         etAddText = childText.findViewById(R.id.etAddText);
-        btnAddText = childText.findViewById(R.id.btnAddText);
 
         sbBrightness = (SeekBar)  child.findViewById(R.id.sbBrightness);
-       // sbBrightness.setProgress(0);
         messageBr = child.findViewById(R.id.tvBrightnessVal);
 
         sbSaturation = (SeekBar)  child.findViewById(R.id.sbSaturation);
-       // sbSaturation.setProgress(0);
         messageSa = child.findViewById(R.id.tvSaturationVal);
 
         sbContrast = (SeekBar)  child.findViewById(R.id.sbContrast);
-       // sbContrast.setProgress(0);
         messageCo = child.findViewById(R.id.tvContrastVal);
 
-
-
-
-
         LoadComponents();
+
         infoImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                imgViewDisplay.setOnTouchListener(null);
                 try {
                     ImageInfo();
                 } catch (IOException e) {
@@ -146,6 +126,7 @@ public class KameraYadaGaleri extends AppCompatActivity {
         saveImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                imgViewDisplay.setOnTouchListener(null);
                 try {
                     saveImageToGallery();
                     Toast.makeText(KameraYadaGaleri.this,"Galeriye Kaydedildi.", Toast.LENGTH_LONG).show();
@@ -158,7 +139,7 @@ public class KameraYadaGaleri extends AppCompatActivity {
         sbBrightness.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-               // imgViewDisplay.setColorFilter(setBrightness(progress));
+                imgViewDisplay.setOnTouchListener(null);
                 float percentage = (progress / 100.0f);
                 imgViewDisplay.setBrightness(percentage+1);
                 messageBr.setText(String.valueOf(progress));
@@ -175,27 +156,11 @@ public class KameraYadaGaleri extends AppCompatActivity {
 
             }
         });
-        sbContrast.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                float percentage = (progress / 100.0f);
-                imgViewDisplay.setContrast(percentage+1);
-                messageCo.setText(String.valueOf(progress));
-            }
 
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
         sbSaturation.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                imgViewDisplay.setOnTouchListener(null);
                 float percentage = (progress / 100.0f);
                 imgViewDisplay.setSaturation(percentage+1);
                 messageSa.setText(String.valueOf(progress));
@@ -211,9 +176,31 @@ public class KameraYadaGaleri extends AppCompatActivity {
 
             }
         });
+
+        sbContrast.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                imgViewDisplay.setOnTouchListener(null);
+                float percentage = (progress / 100.0f);
+                imgViewDisplay.setContrast(percentage+1);
+                messageCo.setText(String.valueOf(progress));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
         tuneImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                imgViewDisplay.setOnTouchListener(null);
                 if(childTemp==false) {
                     Parent.addView(child);
                     childTemp=true;
@@ -228,6 +215,7 @@ public class KameraYadaGaleri extends AppCompatActivity {
         filterImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                imgViewDisplay.setOnTouchListener(null);
                 if(childTemp==false) {
                     Parent.addView(childFilter);
                     childTemp=true;
@@ -243,12 +231,8 @@ public class KameraYadaGaleri extends AppCompatActivity {
         cropImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                imgViewDisplay.setOnTouchListener(null);
 
-
-
-//               // MediaStore.Images.Media.insertImage(KameraYadaGaleri.this.getContentResolver(), BitMap,String.valueOf("Bitmap"), "imageimage");
-//
-//                Uri contentUri = Uri.fromFile(filee);
 
                 if(childTemp==false) {
                     uriCrop = getImageUri(getApplicationContext(),BitMap);
@@ -260,47 +244,18 @@ public class KameraYadaGaleri extends AppCompatActivity {
                     Parent.removeAllViews();
                     childTemp=false;
                 }
-
             }
         });
 
         textImage.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
-
-
+                imgViewDisplay.setOnTouchListener(null);
                 if(childTemp==false) {
                     Parent.addView(childText);
-                    imgViewDisplay.setOnTouchListener( new View.OnTouchListener(){
+                    TextListener();
 
-                        public boolean onTouch(View v, MotionEvent e) {
-                            //Bitmap workingBitmap = Bitmap.createBitmap(bitmap);
-                            //Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
-
-//            bitmap = Bitmap.createBitmap(bitmap);
-//            bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
-                            Canvas canvas = new Canvas(BitMap);
-
-//                Canvas canvas = new Canvas(bitmap);
-                            Paint paint = new Paint();
-                            paint.setColor(Color.TRANSPARENT);
-                            paint.setStyle(Paint.Style.FILL);
-                            canvas.drawPaint(paint);
-
-                            someGlobalXvariable = e.getX();
-                            someGlobalYvariable = e.getY();
-
-
-                            paint.setColor(Color.BLACK);
-                            paint.setTextSize(100);
-                            canvas.drawText(String.valueOf(etAddText.getText()), someGlobalXvariable, someGlobalYvariable, paint);
-                            imgViewDisplay.setImageBitmap(BitMap);
-
-                            return true;
-
-//            imgViewDisplay.setImageBitmap(mark(BitMap,String.valueOf(etAddText.getText()), someGlobalXvariable, someGlobalYvariable,100));}
-                        }
-                    });
                     childTemp=true;
                 }
                 else{
@@ -318,24 +273,51 @@ public class KameraYadaGaleri extends AppCompatActivity {
 
 
                 if(childTemp==false) {
-                    //Parent.addView(childDraw);
-
+                    DrawListener();
                     childTemp=true;
                 }
                 else{
                     Parent.removeAllViews();
                     childTemp=false;
                 }
-
             }
         });
-        //bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+    }
+
+    private void TextListener(){
+        imgViewDisplay.setOnTouchListener( new View.OnTouchListener(){
+            @SuppressLint("ClickableViewAccessibility")
+            @Override
+            public boolean onTouch(View v, MotionEvent e) {
+                BitmapText = BitMap.copy(Bitmap.Config.ARGB_8888, true);
+                Canvas canvas = new Canvas(BitmapText);
+                Paint paint = new Paint();
+
+                paint.setColor(Color.TRANSPARENT);
+                paint.setStyle(Paint.Style.FILL);
+                canvas.drawPaint(paint);
+
+                someGlobalXvariable = e.getX();
+                someGlobalYvariable = e.getY();
+
+                paint.setColor(Color.BLACK);
+                paint.setTextSize(100);
+                canvas.drawText(String.valueOf(etAddText.getText()), someGlobalXvariable, someGlobalYvariable, paint);
+
+                imgViewDisplay.setImageBitmap(BitmapText);
+
+                return true;
+            }
+        });
+    }
+
+    private void DrawListener(){
         imgViewDisplay.setOnTouchListener(new View.OnTouchListener() {
             @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                canvas = new Canvas(BitMap);
-                paint = new Paint();
+                Canvas canvas = new Canvas(BitmapText);
+                Paint paint = new Paint();
                 paint.setColor(Color.GREEN);
 
                 int action = event.getAction();
@@ -356,34 +338,13 @@ public class KameraYadaGaleri extends AppCompatActivity {
                         break;
                     default:
                         break;
-
-
                 }
-                imgViewDisplay.setImageBitmap(BitMap);
-                //setOnclickListeners();
+                imgViewDisplay.setImageBitmap(BitmapText);
                 return true;
             }
-
-
         });
-
     }
-@SuppressLint("ClickableViewAccessibility")
-private void PosTouch(){
 
-
-
-    btnAddText.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-//            canvas.drawText(String.valueOf(etAddText.getText()), imgViewDisplay.getX()/2, imgViewDisplay.getY()/2, paint);
-
-        }
-    });
-
-
-
-}
     @Override
     protected void onStart()
     {
@@ -423,23 +384,6 @@ private void PosTouch(){
 
 
 
-    public static Bitmap mark(Bitmap src, String watermark, float X, float Y, int size) {
-        int w = src.getWidth();
-        int h = src.getHeight();
-        Bitmap result = Bitmap.createBitmap(w, h, src.getConfig());
-
-        Canvas canvas = new Canvas(result);
-        canvas.drawBitmap(src, 0, 0, null);
-
-        Paint paint = new Paint();
-        paint.setColor(Color.TRANSPARENT);
-        //paint.setAlpha(alpha);
-        paint.setTextSize(size);
-        paint.setAntiAlias(true);
-        //paint.setUnderlineText(underline);
-        canvas.drawText(watermark, X, Y, paint);
-        return result;
-    }
 
 
     public Uri getImageUri(Context inContext, Bitmap inImage) {
@@ -448,6 +392,7 @@ private void PosTouch(){
         String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
         return Uri.parse(path);
     }
+
     public void ImageInfo() throws IOException {
         String mimeType = getContentResolver().getType(uri);
 
@@ -467,25 +412,6 @@ private void PosTouch(){
         builder.show();
         builder.setCancelable(false);
     }
-
-//    public static PorterDuffColorFilter setBrightness(int progress) {
-//        if (progress >=    0)
-//        {
-//            int value = (int) (progress-51) * 255 / 51;
-//
-//            return new PorterDuffColorFilter(Color.argb(value, 255, 255, 255), PorterDuff.Mode.SRC_OVER);
-//
-//        }
-//        else
-//        {
-//            int value = (int) (50-progress) * 255 / 50;
-//            return new PorterDuffColorFilter(Color.argb(value, 0, 0, 0), PorterDuff.Mode.SRC_ATOP);
-//
-//
-//        }
-//    }
-
-
 
     private void saveImageToGallery(){
         imgViewDisplay.buildDrawingCache();
@@ -530,6 +456,7 @@ private void PosTouch(){
     }
 
     private void setOnclickListeners(){
+
         ivOrg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
