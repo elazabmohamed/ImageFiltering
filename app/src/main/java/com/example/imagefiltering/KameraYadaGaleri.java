@@ -11,7 +11,12 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
+import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Shader;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -28,6 +33,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.imagefiltering.model.ConvolutionMatrix;
 import com.mukesh.image_processing.ImageProcessor;
 import com.theartofdev.edmodo.cropper.CropImage;
 
@@ -35,9 +41,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 
+
 public class KameraYadaGaleri extends AppCompatActivity {
     ImageView  tuneImage, saveImage, infoImage, filterImage, cropImage, textImage,
-               drawImage, ivOrg, ivGrayScale, ivTint, ivSnow, ivEngrave, ivShadow, ivFlea;
+               drawImage, sharpImage, smoothImage, mirrorImage, reflectionImage, ivOrg, ivGrayScale, ivTint, ivSnow, ivEngrave, ivShadow, ivFlea;
     ImageFilterView imgViewDisplay;
     LinearLayout Parent;
     View childFilter, child,childText;
@@ -50,6 +57,9 @@ public class KameraYadaGaleri extends AppCompatActivity {
     float someGlobalXvariable, someGlobalYvariable;
     float downx = 0, downy = 0, upx = 0, upy = 0;
     ImageProcessor processor = new ImageProcessor();
+
+    public static final int FLIP_VERTICAL = 1;
+    public static final int FLIP_HORIZONTAL = 2;
 
     Bitmap BitMap;
     Bitmap bitmap;
@@ -78,6 +88,10 @@ public class KameraYadaGaleri extends AppCompatActivity {
         textImage = findViewById(R.id.textImage);
         drawImage = findViewById(R.id.drawImage);
         tuneImage = findViewById(R.id.ivTint);
+        sharpImage = findViewById(R.id.sharpImage);
+        smoothImage = findViewById(R.id.smoothImage);
+        mirrorImage = findViewById(R.id.mirrorImage);
+        reflectionImage = findViewById(R.id.reflectionImage);
 
         uri = getIntent().getParcelableExtra("imageUri");
         imgViewDisplay.setImageURI(uri);
@@ -282,6 +296,124 @@ public class KameraYadaGaleri extends AppCompatActivity {
                 }
             }
         });
+        sharpImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imgViewDisplay.setOnTouchListener(null);
+                BitMap=sharpen(bitmap,11);
+                imgViewDisplay.setImageBitmap(BitMap);
+            }
+        });
+
+        smoothImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imgViewDisplay.setOnTouchListener(null);
+                BitMap=smooth(bitmap,5);
+                imgViewDisplay.setImageBitmap(BitMap);
+            }
+        });
+        mirrorImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imgViewDisplay.setOnTouchListener(null);
+                BitMap=flip(bitmap,2);
+                imgViewDisplay.setImageBitmap(BitMap);
+            }
+        });
+        reflectionImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imgViewDisplay.setOnTouchListener(null);
+                BitMap=applyReflection(bitmap);
+                imgViewDisplay.setImageBitmap(BitMap);
+            }
+        });
+    }
+
+    public static Bitmap sharpen(Bitmap src, double weight) {
+        double[][] SharpConfig = new double[][] {
+                { 0 , -2    , 0  },
+                { -2, weight, -2 },
+                { 0 , -2    , 0  }
+        };
+        ConvolutionMatrix convMatrix = new ConvolutionMatrix(3);
+        convMatrix.applyConfig(SharpConfig);
+        convMatrix.Factor = weight - 8;
+        return ConvolutionMatrix.computeConvolution3x3(src, convMatrix);
+    }
+
+    public static Bitmap smooth(Bitmap src, double value) {
+        ConvolutionMatrix convMatrix = new ConvolutionMatrix(3);
+        convMatrix.setAll(1);
+        convMatrix.Matrix[1][1] = value;
+        convMatrix.Factor = value + 8;
+        convMatrix.Offset = 1;
+        return ConvolutionMatrix.computeConvolution3x3(src, convMatrix);
+    }
+    public static Bitmap flip(Bitmap src, int type) {
+        // create new matrix for transformation
+        Matrix matrix = new Matrix();
+        // if vertical
+        if(type == FLIP_VERTICAL) {
+            // y = y * -1
+            matrix.preScale(1.0f, -1.0f);
+        }
+        // if horizonal
+        else if(type == FLIP_HORIZONTAL) {
+            // x = x * -1
+            matrix.preScale(-1.0f, 1.0f);
+            // unknown type
+        } else {
+            return null;
+        }
+
+        // return transformed image
+        return Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), matrix, true);
+    }
+
+    public static Bitmap applyReflection(Bitmap originalImage) {
+        // gap space between original and reflected
+        final int reflectionGap = 4;
+        // get image size
+        int width = originalImage.getWidth();
+        int height = originalImage.getHeight();
+
+        // this will not scale but will flip on the Y axis
+        Matrix matrix = new Matrix();
+        matrix.preScale(1, -1);
+
+        // create a Bitmap with the flip matrix applied to it.
+        // we only want the bottom half of the image
+        Bitmap reflectionImage = Bitmap.createBitmap(originalImage, 0, height/2, width, height/2, matrix, false);
+
+        // create a new bitmap with same width but taller to fit reflection
+        Bitmap bitmapWithReflection = Bitmap.createBitmap(width, (height + height/2), Bitmap.Config.ARGB_8888);
+
+        // create a new Canvas with the bitmap that's big enough for
+        // the image plus gap plus reflection
+        Canvas canvas = new Canvas(bitmapWithReflection);
+        // draw in the original image
+        canvas.drawBitmap(originalImage, 0, 0, null);
+        // draw in the gap
+        Paint defaultPaint = new Paint();
+        canvas.drawRect(0, height, width, height + reflectionGap, defaultPaint);
+        // draw in the reflection
+        canvas.drawBitmap(reflectionImage,0, height + reflectionGap, null);
+
+        // create a shader that is a linear gradient that covers the reflection
+        Paint paint = new Paint();
+        LinearGradient shader = new LinearGradient(0, originalImage.getHeight(), 0,
+                bitmapWithReflection.getHeight() + reflectionGap, 0x70ffffff, 0x00ffffff,
+                Shader.TileMode.CLAMP);
+        // set the paint to use this shader (linear gradient)
+        paint.setShader(shader);
+        // set the Transfer mode to be porter duff and destination in
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
+        // draw a rectangle using the paint with our linear gradient
+        canvas.drawRect(0, height, width, bitmapWithReflection.getHeight() + reflectionGap, paint);
+
+        return bitmapWithReflection;
     }
 
     private void TextListener(){
