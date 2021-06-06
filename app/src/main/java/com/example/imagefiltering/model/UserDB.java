@@ -14,16 +14,9 @@ public class UserDB {
         return 1;
     }
 
-    //Practice 1. show the list in a spinner in Home activity
     public ArrayList<User> GetAllUsers(){
 
         return UserList;
-    }
-
-    //2. from spinner user will select a name and click delete
-    public boolean deleteUser(String name){
-        return true;
-
     }
 
     public static boolean Login(String username,String password){
@@ -38,6 +31,5 @@ public class UserDB {
             }
         }
         return result;
-
     }
 }

@@ -78,7 +78,6 @@ public class MainActivity extends AppCompatActivity {
                     galleryAddPic();
 
                 } catch (ActivityNotFoundException e) {
-                    // display error state to the user
                 }
             }
         });

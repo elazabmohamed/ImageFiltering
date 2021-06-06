@@ -78,7 +78,6 @@ public class GirisYapActivity extends AppCompatActivity {
         }
 
         if (UserDB.Login(username, password)) {
-            //      temporary code to change the visibilty of giris yap buttton untill new activity is created
             MainActivity.btnGirisYap.setVisibility(View.GONE);
             onBackPressed();
         }
